@@ -19,15 +19,20 @@
         </h3>
         <p>
             Press <spam class="highlight">n</spam> to <spam class="highlight">add_hair</spam> mode to put a hair wherever you want.<br/><br/>
-            Press <spam class="highlight">m</spam> to <spam class="highlight">follow_mouse</spam> mode to use mouse to move the character and see the hair's reaction.
+            Press <spam class="highlight">m</spam> to <spam class="highlight">follow_mouse</spam> mode to use mouse to move the character and see the hair's reaction.<br/><br/>
+            Press <spam class="highlight">b</spam> to <spam class="highlight">clear</spam> to clean the hair placed.
         </p>
 
         <h3>
             Actual mode: <spam class="highlight" id="mode">follow_mouse</spam>
         </h3>
 
+
         <h3>
-            Hair color: <input id="hair_color" class="rounded" type="color"}"/>
+            Hair width: <input value="3" id="hair_width" type="number"/>
+        </h3>
+        <h3>
+            Hair color: <input id="hair_color" value="#ff6b6b" class="rounded" type="color"/>
         </h3>
 
     </div>
@@ -37,9 +42,12 @@
         canvas = document.getElementById("canvas");
         ctx = canvas.getContext("2d");
         var hair_color = "rgb(214,67,60)";
+        var hair_width = 3;
         var aurora = new char(20,50,ctx);
 
-        document.getElementById("hair_color").value="#ff6b6b";
+        document.getElementById("hair_width").onchange=function(){
+            hair_width = this.value;
+        }
         document.getElementById("hair_color").onchange=function(){
            hair_color="rgb(" + this.value.match(/[A-Za-z0-9]{2}/g).map(function(v) { return parseInt(v, 16);}).join(",") + ")";
         };
@@ -52,12 +60,14 @@
 
             last = new Node(ctx, x,y);
             last.color = hair_color;
+            last.lineWidth = hair_width;
             raiz = last;
             //raiz.father(last);
 
             for (var i = 0; i <=size; i++){
                 node = new Node(ctx, x,y);
                 node.color = hair_color;
+                node.lineWidth = hair_width;
                 last.father(node);
                 last = node;
             }
@@ -68,8 +78,8 @@
         //Array com todos os fios de cabelo
         hairs = [];
         //Cria um fio inicial
-        raiz = new_hair(200,150);
-        hairs.push(raiz);
+        //raiz = new_hair(200,150);
+        //hairs.push(raiz);
 
         //mode = follow_mouse | add_hair
         var mode = "follow_mouse";
@@ -154,7 +164,7 @@
                      console.log("mode changed to 'follow_mouse'");
                 }
                 else if(event.key == "b"){
-                    alert(JSON.stringify(hairspoint));
+                    hairs = [];
                 }
 
             }
