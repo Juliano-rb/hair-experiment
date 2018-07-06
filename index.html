@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hair experiment</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script type="text/javascript" src="node.js"></script>
+    <script type="text/javascript" src="char.js"></script>
+</head>
+<body>
+    <canvas id="canvas", width="900", height="500">Seu dispositivo não suporta a tag <i>canvas</i> do HTML5.</canvas>
+
+    <div id="info">
+        <h2>
+            Hair simulation
+        </h2>
+
+        <h3>
+            How to use?
+        </h3>
+        <p>
+            Press <spam class="highlight">n</spam> to <spam class="highlight">add_hair</spam> mode to put a hair wherever you want.<br/><br/>
+            Press <spam class="highlight">m</spam> to <spam class="highlight">follow_mouse</spam> mode to use mouse to move the character and see the hair's reaction.
+        </p>
+
+        <h3>
+            Actual mode: <spam class="highlight" id="mode">follow_mouse</spam>
+        </h3>
+
+        <h3>
+            Hair color: <input id="hair_color" class="rounded" type="color"}"/>
+        </h3>
+
+    </div>
+
+
+    <script type="text/javascript">
+        canvas = document.getElementById("canvas");
+        ctx = canvas.getContext("2d");
+        var hair_color = "rgb(214,67,60)";
+        var aurora = new char(20,50,ctx);
+
+        document.getElementById("hair_color").value="#ff6b6b";
+        document.getElementById("hair_color").onchange=function(){
+           hair_color="rgb(" + this.value.match(/[A-Za-z0-9]{2}/g).map(function(v) { return parseInt(v, 16);}).join(",") + ")";
+        };
+
+        function new_hair(x,y){
+            //Tamanho do fio de cabelo (Quantidade de nós)
+            size = 15;
+            //raiz = new Node(ctx, x,y);
+            //raiz.color = hair_color;
+
+            last = new Node(ctx, x,y);
+            last.color = hair_color;
+            raiz = last;
+            //raiz.father(last);
+
+            for (var i = 0; i <=size; i++){
+                node = new Node(ctx, x,y);
+                node.color = hair_color;
+                last.father(node);
+                last = node;
+            }
+
+            return raiz;
+        }
+
+        //Array com todos os fios de cabelo
+        hairs = [];
+        //Cria um fio inicial
+        raiz = new_hair(200,150);
+        hairs.push(raiz);
+
+        //mode = follow_mouse | add_hair
+        var mode = "follow_mouse";
+        var mouseclicked = false;
+        //Guarda posições do mouse para saber a direção que está se movento
+        var mposx1, mposy1;
+        var mposx2, mposy2;
+        //local atual da posição do mouse
+        var livex = 0, livey = 0;
+
+        //mouse pressionado:
+        //atualiza as posições iniciais do mouse
+        canvas.addEventListener("mousedown",
+            function(event){
+                if(mode == "follow_mouse"){
+                    mouseclicked = true;
+                    mposx1 = event.clientX;
+                    mposy1 = event.clientY;
+                    //console.log("MOUSEDOWWWNNN");
+                }
+                if(mode == "add_hair"){
+                    //hairspoint.push( [event.clientX, event.clientY] );
+                    hairs.push(new_hair(event.clientX, event.clientY));
+                }
+            }
+        );
+        //Para guardar a posição do mouse atual, usada no modo add_hair
+        //para indicar a posição do mouse
+        canvas.addEventListener("mousemove",
+            function(e){
+                //console.log("MOVEUUU");
+                livex = e.clientX;
+                livey = e.clientY;
+            }
+        );
+        //Quando o mouse move, o vetor de direção é atualizado e os
+        //objetos são movidos
+        canvas.addEventListener("mousemove",
+            function(event){
+                if(mouseclicked && mode == "follow_mouse"){
+                    mposx2 = event.clientX;
+                    mposy2 = event.clientY;
+
+                    var mousedx = mposx2 - mposx1;
+                    var mousedy = mposy2 - mposy1;
+
+                    //console.log(mposx2 + "-" + mposx1 + "="  + mousedx + " " + mposy2 + "-" + mposy1 + "=" +  mousedy);
+                    for(var i = 0; i < hairs.length; i++){
+                        hairs[i].update(mousedx, mousedy);
+                    }
+
+                    aurora.update(mousedx, mousedy);
+
+
+                    mposx1 = mposx2;
+                    mposy1 = mposy2;
+                }
+            }
+        );
+
+        canvas.addEventListener("mouseup",
+            function(event){
+                mouseclicked = false;
+            }
+        );
+        //handler dos botões de mudança de modo
+        canvas.addEventListener("keypress",
+            function(event){
+                console.log(event.key);
+                //Adicionar cabelo
+                if(event.key == 'n'){
+                    mode = "add_hair";
+                    document.body.style.cursor = 'none';
+                    document.getElementById("mode").innerHTML = "add_hair";
+                    console.log("mode changed to 'add_hair'");
+                }
+                //Mover com o mouse
+                else if(event.key == "m"){
+                     mode = "follow_mouse";
+                     document.body.style.cursor = '';
+                     document.getElementById("mode").innerHTML = "follow_mouse";
+                     console.log("mode changed to 'follow_mouse'");
+                }
+                else if(event.key == "b"){
+                    alert(JSON.stringify(hairspoint));
+                }
+
+            }
+        );
+
+        //Loop principal
+        function frame(){
+            ctx.clearRect(0,0,900,500);
+            //Desenha a personagem
+            aurora.draw();
+            //Desenha todos os fios de cabelo
+            for(var i = 0; i < hairs.length; i++)
+                    hairs[i].draw();
+
+
+            if(mode == "add_hair"){
+                ctx.beginPath();
+                ctx.strokeStyle="red";
+                ctx.fillStyle = "red";
+                ctx.lineWidth=2;
+                ctx.arc(livex,livey,3,0,2*Math.PI);
+                ctx.stroke();
+            }
+
+            requestAnimationFrame(frame);
+        }
+        frame();
+
+
+    </script>
+</body>
+</html>

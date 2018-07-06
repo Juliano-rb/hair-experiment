@@ -1,0 +1,28 @@
+#info{
+    width:300px;
+    height: 350px;
+    background-color:#ffeaea;
+
+    border: 1px ridge  rgb(214,67,60);
+    padding: 5px;
+
+    position: absolute;
+
+    right:10px;
+    top:10px;
+}
+
+
+body{
+    font-family: Monospace;
+}
+
+.highlight{
+    color:rgb(214,67,60);
+}
+
+.rounded{
+    /*border:none;*/
+    border: 1px solid;
+    border-radius:10px;
+}
