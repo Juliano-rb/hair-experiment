@@ -1,6 +1,5 @@
-<h1>Hair-Experiment</h1>
 ![hair-experiment](https://i.imgur.com/AMLaTya.png?1)
-
+<h1>Hair-Experiment</h1>
 A small and beauty hair simulation made in HTML5.
 
 This is a non-profit implementation. The character used to better illustrate the results belongs to the game A *Child of Light*.
